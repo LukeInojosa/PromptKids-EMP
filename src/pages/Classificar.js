@@ -3,7 +3,7 @@ import * as tmImage from "@teachablemachine/image";
 
 const MODEL_URL = "https://teachablemachine.withgoogle.com/models/mgw62l8GPb/";
 
-function ImageClassifierComponent() {
+function Classificar() {
   const [imageFile, setImageFile] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [prediction, setPrediction] = useState(null);
@@ -11,36 +11,43 @@ function ImageClassifierComponent() {
   const [model, setModel] = useState(null);
   const imageRef = useRef();
 
-  // Carrega o modelo uma vez
+  // Carrega o modelo da Teachable Machine uma única vez ao montar o componente
   useEffect(() => {
     const loadModel = async () => {
-      const loadedModel = await tmImage.load(MODEL_URL + "model.json", MODEL_URL + "metadata.json");
-      setModel(loadedModel);
+      try {
+        const loadedModel = await tmImage.load(MODEL_URL + "model.json", MODEL_URL + "metadata.json");
+        setModel(loadedModel);
+      } catch (error) {
+        console.error("Failed to load the Teachable Machine model:", error);
+      }
     };
     loadModel();
   }, []);
 
-  // Limpa o objeto URL ao desmontar ou trocar imagem
+  // Limpa o objeto URL ao desmontar o componente ou ao trocar de imagem para evitar vazamento de memória
   useEffect(() => {
     return () => {
       if (imageSrc) URL.revokeObjectURL(imageSrc);
     };
   }, [imageSrc]);
 
+  // Lida com a mudança do arquivo de imagem no input
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
       setImageSrc(URL.createObjectURL(file));
-      setPrediction(null);
+      setPrediction(null); // Reseta a predição para a nova imagem
     }
   };
 
+  // Lida com a classificação da imagem
   const handleClassify = async () => {
     if (!model || !imageRef.current) return;
     setIsLoading(true);
     const predictions = await model.predict(imageRef.current);
     if (predictions?.length) {
+      // Encontra a melhor predição (com a maior probabilidade)
       const best = predictions.reduce((a, b) => (a.probability > b.probability ? a : b));
       setPrediction({
         className: best.className,
@@ -51,22 +58,9 @@ function ImageClassifierComponent() {
   };
 
   return (
-    <div
-      style={{
-        maxWidth: 400,
-        margin: "auto",
-        textAlign: "center",
-        padding: 20,
-        fontFamily: "sans-serif",
-        border: "1px solid #ddd",
-        borderRadius: 8,
-        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-      }}
-    >
-      <h2 style={{ color: "#333" }}>Image Classifier</h2>
-      <p style={{ color: "#666" }}>
-        Select an image to classify it using a Teachable Machine model.
-      </p>
+    <div className="classificar-container">
+      <h2>Classificador de Imagens</h2>
+      <p>Selecione uma imagem para classificá-la usando um modelo de IA.</p>
 
       <input
         type="file"
@@ -76,55 +70,33 @@ function ImageClassifierComponent() {
       />
 
       {imageSrc && (
-        <div style={{ marginTop: 20 }}>
-          <img
-            ref={imageRef}
-            src={imageSrc}
-            alt="Selected for classification"
-            style={{
-              maxWidth: "100%",
-              height: "auto",
-              borderRadius: 4,
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            }}
-            crossOrigin="anonymous"
-          />
+        <div>
+          <div className="image-preview">
+            <img
+              ref={imageRef}
+              src={imageSrc}
+              alt="Selecionada para classificação"
+              crossOrigin="anonymous"
+            />
+          </div>
 
           <button
             onClick={handleClassify}
             disabled={isLoading || !!prediction || !model}
-            style={{
-              marginTop: 20,
-              padding: "10px 20px",
-              fontSize: 16,
-              cursor: isLoading || !!prediction || !model ? "not-allowed" : "pointer",
-              backgroundColor: isLoading ? "#ccc" : "#007bff",
-              color: "white",
-              border: "none",
-              borderRadius: 5,
-            }}
           >
-            {isLoading ? "Classifying..." : "Classify Image"}
+            {isLoading ? "Classificando..." : "Classificar Imagem"}
           </button>
         </div>
       )}
 
       {prediction && (
-        <div
-          style={{
-            marginTop: 20,
-            padding: 15,
-            backgroundColor: "#f9f9f9",
-            border: "1px solid #eee",
-            borderRadius: 5,
-          }}
-        >
-          <h3 style={{ color: "#333", margin: "0 0 10px 0" }}>Results</h3>
+        <div className="results-box">
+          <h3 style={{ color: "#333", margin: "0 0 10px 0" }}>Resultados</h3>
           <p>
-            <strong>Class:</strong> {prediction.className}
+            <strong>Classe:</strong> {prediction.className}
           </p>
           <p>
-            <strong>Confidence:</strong> {(prediction.probability * 100).toFixed(2)}%
+            <strong>Confiança:</strong> {(prediction.probability * 100).toFixed(2)}%
           </p>
         </div>
       )}
@@ -132,4 +104,4 @@ function ImageClassifierComponent() {
   );
 }
 
-export default ImageClassifierComponent;
+export default Classificar;

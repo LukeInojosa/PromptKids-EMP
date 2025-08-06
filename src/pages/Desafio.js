@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import '../styles/desafio.css';
 import { useNavigate } from 'react-router-dom';
+
 const cores = [
   { id: 1, src: 'https://singlecolorimage.com/get/ffe600/100x100', cor: 'amarela' },
   { id: 2, src: 'https://singlecolorimage.com/get/00ff00/100x100', cor: 'verde' },
@@ -29,13 +29,12 @@ export default function Desafio() {
     ev.dataTransfer.setData('text/plain', id);
   };
 
-  // Cores que ainda não foram classificadas
   const naoClassificadas = cores.filter(f =>
     !classificadas.verde.includes(f.id) && !classificadas.amarela.includes(f.id)
   );
 
   return (
-    <div>
+    <div className="desafio-container">
       <h3>Classifique as imagens:</h3>
       <div className="area-classificacao">
         <div className="zona" onDrop={onDrop('amarela')} onDragOver={allowDrop}>
@@ -49,7 +48,6 @@ export default function Desafio() {
                 alt="cor"
                 className="fruta"
                 draggable={false}
-                style={{ opacity: 1 }}
               />
             );
           })}
@@ -65,13 +63,12 @@ export default function Desafio() {
                 alt="cor"
                 className="fruta"
                 draggable={false}
-                style={{ opacity: 1 }}
               />
             );
           })}
         </div>
       </div>
-      <div className="frutas">
+      <div className="frutas-area">
         {naoClassificadas.map(f =>
           <img
             key={f.id}

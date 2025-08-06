@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/trilha.css';
 
 export default function Trilha() {
   const navigate = useNavigate();

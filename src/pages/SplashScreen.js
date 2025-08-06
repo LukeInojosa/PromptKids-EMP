@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/splash.css';
 
 export default function SplashScreen() {
   const navigate = useNavigate();
