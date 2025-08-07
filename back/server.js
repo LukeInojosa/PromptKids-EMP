@@ -13,7 +13,7 @@ app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(express.json({ limit: '10mb' }));
 
 // Carrega a chave de API da variável de ambiente
-const geminiApiKey = process.env.GEMINI_API_KEY || 'AIzaSyAl4XGrYZGh4XUo9MoYVqIFdsq_HxP9OmA';
+const geminiApiKey = process.env.GEMINI_API_KEY || '';
 
 if (!geminiApiKey) {
   console.error("Erro: A chave de API do Gemini não foi configurada. Certifique-se de que o arquivo .env está presente e contém GEMINI_API_KEY.");
